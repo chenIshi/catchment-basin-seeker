@@ -21,3 +21,8 @@ tree data structure, just 2D array look up.
 
 ## Environment Requirement
 1. python verion >= 3.6.9 (Tested under 3.6.9)
+
+## Quick start
+```sh
+python3 main.py
+```
