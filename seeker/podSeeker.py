@@ -37,6 +37,19 @@ def find_aggr_switch_on_path(edge_id1: int, edge_id2: int, pod_scale: int):
         aggr_id2.append(starting_aggr_id2 + i)
     return [aggr_id1, aggr_id2]
 
+def find_single_aggr(edge_id:int, pod_scale:int):
+    if pod_scale % 2 != 0:
+        logging.error("Wrong input in find_aggr_switch_on_path: pod_scale should be even")
+        return
+    total_edge_sw_number = pod_scale * (int(pod_scale / 2))
+    aggr_sw_within_the_same_pod = int(pod_scale / 2)
+    edge_sw_within_the_same_pod = int(pod_scale / 2)
+    pod_num = math.floor(edge_id / edge_sw_within_the_same_pod)
+    starting_aggr_id = total_edge_sw_number + pod_num * aggr_sw_within_the_same_pod
+    aggr_id = []
+    for i in range(int(edge_sw_within_the_same_pod)):
+        aggr_id.append(starting_aggr_id + i)
+    return aggr_id
 '''
 Find core switches along assigned routing from switch_id1 to switch_id2
 - pod_scale: overall pod number in the topology, should be 2's multiples
@@ -51,6 +64,21 @@ def find_core_switch_on_path(pod_scale: int):
     core_id = []
     for i in range(int(total_core_switch_number)):
         core_id.append(total_pod_switch_number + i)
+    return core_id
+
+def find_single_core(aggr_id:int, pod_scale:int):
+    if pod_scale % 2 != 0:
+        logging.error("Wrong input in find_core_switch_on_path: pod_scale should be even")
+        return
+    total_pod_switch_number = pod_scale ** 2
+    total_edge_sw_number = pod_scale * (int(pod_scale / 2))
+    aggr_sw_within_the_same_pod = int(pod_scale / 2)
+    core_sw_within_the_same_pod = int(pod_scale / 2)
+    core_num = (aggr_id - total_edge_sw_number) % aggr_sw_within_the_same_pod
+    starting_core_id = total_pod_switch_number + core_num * core_sw_within_the_same_pod
+    core_id = []
+    for i in range(core_sw_within_the_same_pod):
+        core_id.append(starting_core_id + i)
     return core_id
 
 '''
