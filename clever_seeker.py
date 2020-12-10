@@ -31,7 +31,7 @@ def create_env():
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-r", "--read", help="Query input file location", dest="query_location", default="./data/queries.json")
-    parser.add_argument("-n", "--number", help="Total query number", dest="query_number", type=int, default=1)
+    parser.add_argument("-n", "--number", help="Total query number", dest="query_number", type=int, default=250)
     parser.add_argument("-a", "--aggregator", help="Also deploy aggregator", type=str2bool, nargs='?',
 const=True, default=True, dest="deploy_aggr")
     args = parser.parse_args()
