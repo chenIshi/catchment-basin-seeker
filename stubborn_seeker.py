@@ -1,3 +1,10 @@
+'''
+Stubborn seeker borrow the main structure from clever Seeker
+However, it insist putting aggregators on controller's ToR,
+and also make controller's ToR available for placing monitor
+'''
+
+
 from argparse import ArgumentParser
 import json, logging
 
@@ -55,6 +62,9 @@ const=True, default=True, dest="deploy_aggr")
     for i in range(args.query_number):
         monitors_under_queries[i] = []
 
+    # place all aggregator on controller's ToR first
+    weights[0] += args.query_number
+
     # we first place all query only to edge sw
     # also consider load balance among edge sw
     # but never place monitor on controller's edge sw
@@ -68,21 +78,9 @@ const=True, default=True, dest="deploy_aggr")
             switch_id1=query.src_id,
             switch_id2=query.dst_id,
             pod_scale=4)
-        if edge_sw1 == 0:
-            switch_queries[edge_sw2].append(query)
-            monitors_under_queries[input_query['query_id']].append(edge_sw2)
-            weights[edge_sw2] += 1
-        elif edge_sw2 == 0:
-            switch_queries[edge_sw1].append(query)
-            monitors_under_queries[input_query['query_id']].append(edge_sw1)
-            weights[edge_sw1] += 1
-        elif weights[edge_sw1] > weights[edge_sw2]:
-            switch_queries[edge_sw2].append(query)
-            monitors_under_queries[input_query['query_id']].append(edge_sw2)
+        if weights[edge_sw1] > weights[edge_sw2]:
             weights[edge_sw2] += 1
         else:
-            switch_queries[edge_sw1].append(query)
-            monitors_under_queries[input_query['query_id']].append(edge_sw1)
             weights[edge_sw1] += 1
 
     # currently we got the lowest overall tasks
@@ -102,56 +100,40 @@ const=True, default=True, dest="deploy_aggr")
         sandhills.append(weights.index(edge_monitor_val))
 
     for sandhill in sandhills:
-        victim_available = True
-        # [(entry id, [sw_id1, ...]), (...)]
-        swap_out_list = []
-        for index, switch_query in enumerate(switch_queries[sandhill]):
-            # we only push down sandhill once it is over average
-            avg_task_count = overall_task_count / 20
-            if victim_available and (weights[sandhill] > avg_task_count):
-                victim_sws = []
-                aggr_sws = Seeker.find_single_aggr(edge_id=sandhill, pod_scale=4)
-                for aggr_sw in aggr_sws:
-                    if weights[aggr_sw] < avg_task_count:
-                        victim_sws.append(aggr_sw)
-                    else:
-                        # aggr sw also has no room for new queries
-                        # ask core sw to adopt queries left
-                        core_sws = Seeker.find_single_core(aggr_id=aggr_sw, pod_scale=4)
-                        for core_sw in core_sws:
-                            # once a single core trial failes, then we won't be able to push sandhill anymore
-                            if weights[core_sw] > avg_task_count:
-                                victim_available = False
-                                break
-                            else:
-                                victim_sws.append(core_sw)
-                        if not victim_available:
-                            break
-                if victim_available:
-                    # put the swap-out relationship into a waiting list
-                    # we shouldn't modify the list in its own iterator
-                    swap_out_list.append((index, victim_sws))
-                    # however, we should faithfully update victim weight at real time
-                    for victim_sw in victim_sws:
-                        weights[victim_sw] += 1
-                    overall_task_count += len(victim_sws) - 1
-            else:
-                # we make the sandhill not greater than avg
-                # or we couldn't find any victim to lower the sandhill
-                # move on to next edge monitor
+        water_level = weights[sandhill]
+        if sandhill == 0:
+            water_level -= args.query_number
+
+        for i in range(water_level):
+            # the water_level is only for monitor tasks, not included aggregator task
+            if sandhill == 0 and weights[0] <= args.query_number:
                 break
-        # actually transfer task from edge monitor to victom sws
-        for swap_out_item in reversed(swap_out_list):
-            query = switch_queries[sandhill].pop(swap_out_item[0])
-            monitors_under_queries[query.query_id].remove(sandhill)
-            for victim_sw in swap_out_item[1]:
-                monitors_under_queries[query.query_id].append(victim_sw)
-                switch_queries[victim_sw].append(query)
 
-        weights[sandhill] -= len(swap_out_list)
+            # find victim
+            aggr_sws = Seeker.find_single_aggr(edge_id=sandhill, pod_scale=4)
+            aggr_cost = (weights[aggr_sws[0]] + weights[aggr_sws[1]]) / 2
+            hybrid_cost_with_0, hybrid_cost_with_1, core_cost = weights[aggr_sws[0]], weights[aggr_sws[1]], 0
+            core_replace_1 = Seeker.find_single_core(aggr_id=aggr_sws[1], pod_scale=4)
+            core_replace_0 = Seeker.find_single_core(aggr_id=aggr_sws[0], pod_scale=4)
+            for core_sw in core_replace_1:
+                hybrid_cost_with_0 += weights[core_sw]
+                core_cost += weights[core_sw]
+            for core_sw in core_replace_0:
+                hybrid_cost_with_1 += weights[core_sw]
+                core_cost += weights[core_sw]
 
-    # finally, put all aggregator on controller's ToR
-    weights[0] += args.query_number
+            chosen_pos = Judge.find_lowest_cost_node(
+                [weights[sandhill], aggr_cost, (hybrid_cost_with_0 / 3), (hybrid_cost_with_1 / 3), (core_cost / 4)],
+                [[sandhill], aggr_sws, [aggr_sws[0]] + core_replace_1, [aggr_sws[1]] + core_replace_0, core_replace_0 + core_replace_1])
+
+            if sandhill in chosen_pos:
+                    break
+            else:
+                weights[sandhill] -= 1
+                for sw in chosen_pos:
+                    weights[sw] += 1
+
+
 
     # dump simple debug result
     for idx, weight in enumerate(weights):
