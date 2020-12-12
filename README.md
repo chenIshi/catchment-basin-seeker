@@ -19,7 +19,7 @@ finally k<sup>2</sup>/4 iteration of core switches
 As a result, we unfold the tree operation to an array operation, so there won't be any
 tree data structure, just 2D array look up.
 
-### Clever(?) Seeker
+### Seekers
 Actually, it would be naive and rather simple if we only have to consider monitor
 placement only. However, with the introduction of aggregator, which is build upon
 monitor placement, while easily mess the balance established by monitor arrangment.
@@ -49,6 +49,16 @@ As a result, we come out a simple (un-optimized) method of placing monitors ...
 my boss (in brief, we are still iterating the solutions). The explaination of alg will be
 offered once it is relatively stable.
 
+#### Types
+
+1. Stubborn
+Sandhill base approach (conflicted sandhill height is determined by avg)
+2. Clever (Conservative)
+Reservoir base approach (conflicted sandhill height is determined by min)
+3. Aggressive
+ Reservoir base approach (conflicted sandhill height is determined by avg)
+
+#### Others
 
 TODO:
 1. Probabilistic sandhill swap-int-and-out
