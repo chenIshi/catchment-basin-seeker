@@ -99,7 +99,8 @@ const=True, default=True, dest="deploy_aggr")
     edge_monitors_val_rev_order.sort(reverse=True)
     sandhills = []
     for edge_monitor_val in edge_monitors_val_rev_order:
-        sandhills.append(weights.index(edge_monitor_val))
+        if edge_monitor_val > 0:
+            sandhills.append(weights.index(edge_monitor_val))
 
     for sandhill in sandhills:
         victim_available = True
@@ -135,6 +136,7 @@ const=True, default=True, dest="deploy_aggr")
                     for victim_sw in victim_sws:
                         weights[victim_sw] += 1
                     overall_task_count += len(victim_sws) - 1
+                    weights[sandhill] -= 1
             else:
                 # we make the sandhill not greater than avg
                 # or we couldn't find any victim to lower the sandhill
@@ -148,15 +150,12 @@ const=True, default=True, dest="deploy_aggr")
                 monitors_under_queries[query.query_id].append(victim_sw)
                 switch_queries[victim_sw].append(query)
 
-        weights[sandhill] -= len(swap_out_list)
-
     # finally, put all aggregator on controller's ToR
     weights[0] += args.query_number
 
     # dump simple debug result
     for idx, weight in enumerate(weights):
-        if weight > 0:
-            print("Switch %d weight = %d" % (idx, weight))
+        print("Switch %d weight = %d" % (idx, weight))
     mean = sum(weights) / len(weights)
     std_err = (sum((i - mean) ** 2 for i in weights) / len(weights)) ** 0.5
     print("Overall task number = %d, avg task = %.2f, std error = %.2f" % (sum(weights), mean, std_err))

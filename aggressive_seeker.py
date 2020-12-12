@@ -99,7 +99,8 @@ const=True, default=True, dest="deploy_aggr")
     edge_monitors_val_rev_order.sort(reverse=True)
     sandhills = []
     for edge_monitor_val in edge_monitors_val_rev_order:
-        sandhills.append(weights.index(edge_monitor_val))
+        if edge_monitor_val > 0:
+            sandhills.append(weights.index(edge_monitor_val))
 
     for sandhill in sandhills:
         victim_available = True
@@ -111,24 +112,22 @@ const=True, default=True, dest="deploy_aggr")
             if victim_available and (weights[sandhill] > avg_task_count):
                 victim_sws = []
                 aggr_sws = Seeker.find_single_aggr(edge_id=sandhill, pod_scale=4)
-                if (weights[aggr_sws[0]] + weights[aggr_sws[1]] / 2) < avg_task_count:
+                if ((weights[aggr_sws[0]] + weights[aggr_sws[1]]) / 2) < avg_task_count:
                     victim_sws += aggr_sws
-                for aggr_sw in aggr_sws:
-                    if weights[aggr_sw] < avg_task_count:
-                        victim_sws.append(aggr_sw)
-                    else:
-                        # aggr sw also has no room for new queries
-                        # ask core sw to adopt queries left
-                        core_sws = Seeker.find_single_core(aggr_id=aggr_sw, pod_scale=4)
-                        for core_sw in core_sws:
-                            # once a single core trial failes, then we won't be able to push sandhill anymore
-                            if weights[core_sw] > avg_task_count:
+                else:
+                    for aggr_sw in aggr_sws:
+                        if weights[aggr_sw] < avg_task_count:
+                            victim_sws.append(aggr_sw)
+                        else:
+                            # aggr sw also has no room for new queries
+                            # ask core sw to adopt queries left
+                            core_sws = Seeker.find_single_core(aggr_id=aggr_sw, pod_scale=4)
+                            core_cost = (weights[core_sws[0]] + weights[core_sws[1]]) / 2
+                            if core_cost < avg_task_count:
+                                victim_sws += core_sws
+                            else:
                                 victim_available = False
                                 break
-                            else:
-                                victim_sws.append(core_sw)
-                        if not victim_available:
-                            break
                 if victim_available:
                     # put the swap-out relationship into a waiting list
                     # we shouldn't modify the list in its own iterator
@@ -137,11 +136,13 @@ const=True, default=True, dest="deploy_aggr")
                     for victim_sw in victim_sws:
                         weights[victim_sw] += 1
                     overall_task_count += len(victim_sws) - 1
+                    weights[sandhill] -= 1
             else:
                 # we make the sandhill not greater than avg
                 # or we couldn't find any victim to lower the sandhill
                 # move on to next edge monitor
                 break
+        print("len(swap_out_list) = %d" %(len(swap_out_list)))
         # actually transfer task from edge monitor to victom sws
         for swap_out_item in reversed(swap_out_list):
             query = switch_queries[sandhill].pop(swap_out_item[0])
@@ -150,15 +151,12 @@ const=True, default=True, dest="deploy_aggr")
                 monitors_under_queries[query.query_id].append(victim_sw)
                 switch_queries[victim_sw].append(query)
 
-        weights[sandhill] -= len(swap_out_list)
-
     # finally, put all aggregator on controller's ToR
     weights[0] += args.query_number
 
     # dump simple debug result
     for idx, weight in enumerate(weights):
-        if weight > 0:
-            print("Switch %d weight = %d" % (idx, weight))
+        print("Switch %d weight = %d" % (idx, weight))
     mean = sum(weights) / len(weights)
     std_err = (sum((i - mean) ** 2 for i in weights) / len(weights)) ** 0.5
     print("Overall task number = %d, avg task = %.2f, std error = %.2f" % (sum(weights), mean, std_err))

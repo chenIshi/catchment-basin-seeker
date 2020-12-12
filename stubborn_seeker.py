@@ -97,7 +97,8 @@ const=True, default=True, dest="deploy_aggr")
     edge_monitors_val_rev_order.sort(reverse=True)
     sandhills = []
     for edge_monitor_val in edge_monitors_val_rev_order:
-        sandhills.append(weights.index(edge_monitor_val))
+        if edge_monitor_val > 0:
+            sandhills.append(weights.index(edge_monitor_val))
 
     for sandhill in sandhills:
         water_level = weights[sandhill]
@@ -137,8 +138,7 @@ const=True, default=True, dest="deploy_aggr")
 
     # dump simple debug result
     for idx, weight in enumerate(weights):
-        if weight > 0:
-            print("Switch %d weight = %d" % (idx, weight))
+        print("Switch %d weight = %d" % (idx, weight))
     mean = sum(weights) / len(weights)
     std_err = (sum((i - mean) ** 2 for i in weights) / len(weights)) ** 0.5
     print("Overall task number = %d, avg task = %.2f, std error = %.2f" % (sum(weights), mean, std_err))
