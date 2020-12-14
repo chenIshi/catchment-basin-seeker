@@ -93,14 +93,11 @@ const=True, default=True, dest="deploy_aggr")
         overall_task_count = len(input_queries)
 
     # sandhills are edge monitors awaits to push their task to center sws
-    edge_monitors_val_rev_order = weights.copy()
-    edge_monitors_val_rev_order.sort(reverse=True)
-    sandhills = []
-    for edge_monitor_val in edge_monitors_val_rev_order:
-        if edge_monitor_val > 0:
-            sandhills.append(weights.index(edge_monitor_val))
+    sandhills = sorted(range(len(weights)), key=lambda k: weights[k], reverse=True)
 
     for sandhill in sandhills:
+        if sandhill > 7:
+            break
         water_level = weights[sandhill]
         if sandhill == 0:
             water_level -= args.query_number

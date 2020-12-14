@@ -95,14 +95,11 @@ const=True, default=True, dest="deploy_aggr")
         overall_task_count = len(input_queries)
 
     # sandhills are edge monitors awaits to push their task to center sws
-    edge_monitors_val_rev_order = weights.copy()
-    edge_monitors_val_rev_order.sort(reverse=True)
-    sandhills = []
-    for edge_monitor_val in edge_monitors_val_rev_order:
-        if edge_monitor_val > 0:
-            sandhills.append(weights.index(edge_monitor_val))
+    sandhills = sorted(range(len(weights)), key=lambda k: weights[k], reverse=True)
 
     for sandhill in sandhills:
+        if weights[sandhill] <= 0:
+            break
         victim_available = True
         # [(entry id, [sw_id1, ...]), (...)]
         swap_out_list = []
@@ -142,7 +139,6 @@ const=True, default=True, dest="deploy_aggr")
                 # or we couldn't find any victim to lower the sandhill
                 # move on to next edge monitor
                 break
-        print("len(swap_out_list) = %d" %(len(swap_out_list)))
         # actually transfer task from edge monitor to victom sws
         for swap_out_item in reversed(swap_out_list):
             query = switch_queries[sandhill].pop(swap_out_item[0])
