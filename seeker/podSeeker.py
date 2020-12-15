@@ -86,50 +86,87 @@ Assume controller being host 1
 Also, how source routing did is one concern
 '''
 def find_route_to_controller(src_addr_id: int):
-    if src_addr_id == 1:
+    if src_addr_id == 0:
         print("Monitor can't be set on controller's ToR !")
         return []
+    elif src_addr_id == 1:
+        return [9, 0]
     elif src_addr_id == 2:
-        return [10, 1]
+        return [10, 16, 8, 0]
     elif src_addr_id == 3:
-        return [11, 17, 9, 1]
+        return [11, 18, 9, 0]
     elif src_addr_id == 4:
-        return [12, 19, 10, 1]
+        return [12, 17, 8, 0]
     elif src_addr_id == 5:
-        return [13, 18, 9, 1]
+        return [13, 19, 9, 0]
     elif src_addr_id == 6:
-        return [14, 20, 10, 1]
+        return [14, 16, 8, 0]
     elif src_addr_id == 7:
-        return [15, 17, 9, 1]
+        return [15, 18, 9, 0]
     elif src_addr_id == 8:
-        return [16, 19, 10, 1]
+        return [12, 17, 8, 0]
     elif src_addr_id == 9:
-        return [13, 18, 9, 1]
+        return [0]
     elif src_addr_id == 10:
-        return [1]
+        return [17, 8, 0]
     elif src_addr_id == 11:
-        return [18, 9, 1]
+        return [19, 9, 0]
     elif src_addr_id == 12:
-        return [20, 10, 1]
+        return [16, 8, 0]
     elif src_addr_id == 13:
-        return [17, 9, 1]
+        return [18, 9, 0]
     elif src_addr_id == 14:
-        return [19, 10, 1]
+        return [17, 8, 0]
     elif src_addr_id == 15:
-        return [18, 9, 1]
+        return [19, 9, 9]
     elif src_addr_id == 16:
-        return [20, 10, 1]
+        return [8, 0]
     elif src_addr_id == 17:
-        return [9, 1]
+        return [8, 0]
     elif src_addr_id == 18:
-        return [9, 1]
+        return [9, 0]
     elif src_addr_id == 19:
-        return [10, 1]
-    elif src_addr_id == 20:
-        return [10, 1]
+        return [9, 0]
     else:
         print("Error: unmatched src addr id in finding route back to controller")
         return []
+
+def dump_link_info(link_costs:list):
+    print("########    LINK STATUS    ########")
+    print("#####       EDGE - AGGR        ####")
+    print("s0-s8 -> %d" % (link_costs[0][8] + link_costs[8][0]))
+    print("s0-s9 -> %d" % (link_costs[0][9] + link_costs[9][0]))
+    print("s1-s8 -> %d" % (link_costs[1][8] + link_costs[8][1]))
+    print("s1-s9 -> %d" % (link_costs[1][9] + link_costs[9][1]))
+    print("s2-s10 -> %d" % (link_costs[2][10] + link_costs[10][2]))
+    print("s2-s11 -> %d" % (link_costs[2][11] + link_costs[11][2]))
+    print("s3-s10 -> %d" % (link_costs[3][10] + link_costs[10][3]))
+    print("s3-s11 -> %d" % (link_costs[3][11] + link_costs[11][3]))
+    print("s4-s12 -> %d" % (link_costs[4][12] + link_costs[12][4]))
+    print("s4-s13 -> %d" % (link_costs[4][13] + link_costs[13][4]))
+    print("s5-s12 -> %d" % (link_costs[5][12] + link_costs[12][5]))
+    print("s5-s13 -> %d" % (link_costs[5][13] + link_costs[13][5]))
+    print("s6-s14 -> %d" % (link_costs[6][14] + link_costs[14][6]))
+    print("s6-s15 -> %d" % (link_costs[6][15] + link_costs[15][6]))
+    print("s7-s14 -> %d" % (link_costs[7][14] + link_costs[14][7]))
+    print("s7-s15 -> %d" % (link_costs[7][15] + link_costs[15][7]))
+    print("#####       AGGR - CORE        ####")
+    print("s8-s16 -> %d" % (link_costs[8][16] + link_costs[16][8]))
+    print("s8-s17 -> %d" % (link_costs[8][17] + link_costs[17][8]))
+    print("s9-s18 -> %d" % (link_costs[9][18] + link_costs[18][9]))
+    print("s9-s19 -> %d" % (link_costs[9][19] + link_costs[19][9]))
+    print("s10-s16 -> %d" % (link_costs[10][16] + link_costs[16][10]))
+    print("s10-s17 -> %d" % (link_costs[10][17] + link_costs[17][10]))
+    print("s11-s18 -> %d" % (link_costs[11][18] + link_costs[18][11]))
+    print("s11-s19 -> %d" % (link_costs[11][19] + link_costs[19][11]))
+    print("s12-s16 -> %d" % (link_costs[12][16] + link_costs[16][12]))
+    print("s12-s17 -> %d" % (link_costs[12][17] + link_costs[17][12]))
+    print("s13-s18 -> %d" % (link_costs[13][18] + link_costs[18][13]))
+    print("s13-s19 -> %d" % (link_costs[13][19] + link_costs[19][13]))
+    print("s14-s16 -> %d" % (link_costs[14][16] + link_costs[16][14]))
+    print("s14-s17 -> %d" % (link_costs[14][17] + link_costs[17][14]))
+    print("s15-s18 -> %d" % (link_costs[15][18] + link_costs[18][15]))
+    print("s15-s19 -> %d" % (link_costs[15][19] + link_costs[19][15]))
 
 if __name__ == "__main__":
     edge_sw1, edge_sw2 = find_edge_switch_on_path(switch_id1=1, switch_id2=5, pod_scale=4)

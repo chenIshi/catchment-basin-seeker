@@ -41,6 +41,8 @@ def gen_centrialized_queries(queries:list, number:int, entry_per_query:int, host
     main_num = int(number * 0.9)
     remain_num = number - main_num
 
+    logging.info("Main num = %d, remains %d" % (main_num, remain_num))
+
     gen_uniform_random_queries(queries=queries, number=remain_num,
         entry_per_query=entry_per_query, host=host)
 
@@ -49,7 +51,7 @@ def gen_centrialized_queries(queries:list, number:int, entry_per_query:int, host
             src_shift = random.randint(0, 3)
             dst_shift = random.randint(0, 3)
             queries.append({
-                "query_id": main_query_idx,
+                "query_id": remain_num+ main_query_idx,
                 "src_host_id": main_src_pod * 4 + src_shift,
                 "dst_host_id": main_dst_pod * 4 + dst_shift
             })
