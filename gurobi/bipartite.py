@@ -153,11 +153,16 @@ try:
     # Optimize model
     m.optimize()
 
+    weights = []
     for v in m.getVars():
         if v.varName[0] == 'w':
             print('%s %g' % (v.varName, v.x))
+            weights.append(v.x)
 
     print('Obj: %g' % m.objVal)
+    mean = sum(weights) / len(weights)
+    std_dev = (sum((i - mean) ** 2 for i in weights) / len(weights)) ** 0.5
+    print('Weight mean = %g, variance = %g' % (mean, std_dev))
 
 except gp.GurobiError as e:
     print('Error code ' + str(e.errno) + ': ' + str(e))
