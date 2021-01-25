@@ -72,7 +72,7 @@ if __name__ == "__main__":
     parser.add_argument("-n", "--number", help="Total query number", dest="number", type=int, default=250)
     parser.add_argument("-e", "--entry", help="Entry number per query", dest="entry", type=int, default=4)
     parser.add_argument("--host", help="Number of hosts", dest="host", type=int, default=16)
-    parser.add_argument("-o", "--output", help="Output json location", dest="output", default="queries.json")
+    parser.add_argument("-o", "--output", help="Output json location", dest="output", default="/home/lthpc/git/catchment-basin-seeker/data/queries.json")
     parser.add_argument("-s", "--shuffle", help="Randomly shuffle output json", type=str2bool, nargs='?',
 const=True, default=False, dest="shuffle")
 

@@ -47,7 +47,7 @@ import json
 # 19: (s15, s16, s17)
 # 20: (s16, s17, s18, s19)
 
-with open("../data/queries.json") as input:
+with open("/home/lthpc/git/catchment-basin-seeker/data/queries.json") as input:
     unparsed_queries = input.read()
 
 queries = json.loads(unparsed_queries)
