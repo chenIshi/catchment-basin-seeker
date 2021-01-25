@@ -1,8 +1,8 @@
 #!/bin/bash
 
-dot_per_box=2
+dot_per_box=10
 hop_size=250
-total_hop_steps=2
+total_hop_steps=12
 exec_time_output_dstfile="/home/lthpc/git/catchment-basin-seeker/plot/exec_time.csv"
 
 # clear output dst first
@@ -37,6 +37,8 @@ do
 		fi
 		# python gurobi/bipartite.py | grep "iterations) in" | awk '{print $8}' >> $exec_time_output_dstfile
 		# echo -n "$counter "
+		# a little sleep to try to cool down machine
+		sleep 10
 	done
 	printf "\n" >> $exec_time_output_dstfile
 done
