@@ -28,7 +28,7 @@ def gen_uniform_random_queries(queries:list, number:int, entry_per_query:int, ho
                 "dst_host_id": dst
             })
 
-def gen_centrialized_queries(queries:list, number:int, entry_per_query:int, host:int):
+def gen_centrialized_queries(queries:list, number:int, entry_per_query:int, host:int, percentage: float):
     # we avoid using the first pod as centrialized factor, since it also responsible for controller
     main_src_pod = random.randint(0, 3)
     main_dst_pod = random.randint(0, 3)
@@ -38,7 +38,7 @@ def gen_centrialized_queries(queries:list, number:int, entry_per_query:int, host
     logging.info("Main src pod: %d" % (main_src_pod))
     logging.info("Main dst pod: %d" % (main_dst_pod))
 
-    main_num = int(number * 0.9)
+    main_num = int(number * percentage / 100.0)
     remain_num = number - main_num
 
     logging.info("Main num = %d, remains %d" % (main_num, remain_num))
@@ -66,6 +66,16 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+def restricted_float(x):
+    try:
+        x = float(x)
+    except ValueError:
+        raise argparse.ArgumentTypeError("%r not a floating-point literal" % (x,))
+
+    if x < 0.0 or x > 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,))
+    return x
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-m", "--mode", help="Query pattern mode", dest="mode", type=int, default=0)
@@ -75,18 +85,19 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", help="Output json location", dest="output", default="/home/lthpc/git/catchment-basin-seeker/data/queries.json")
     parser.add_argument("-s", "--shuffle", help="Randomly shuffle output json", type=str2bool, nargs='?',
 const=True, default=False, dest="shuffle")
+    parser.add_argument("-p", "--parameter", help="Supplemental optional parameter for different modes", type=int, default=80, dest="parameter")
 
 
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.WARNING)
 
     queries = []
 
     if args.mode == 0:
         gen_uniform_random_queries(queries=queries, number=args.number, entry_per_query=args.entry, host=args.host)
     elif args.mode == 1:
-        gen_centrialized_queries(queries=queries, number=args.number, entry_per_query=args.entry, host=args.host)
+        gen_centrialized_queries(queries=queries, number=args.number, entry_per_query=args.entry, host=args.host, percentage=args.parameter)
     else:
         logging.error("Modes other than 0 or 1 is not supported yet !")
         exit()
