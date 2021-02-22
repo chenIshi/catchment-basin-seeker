@@ -1,9 +1,9 @@
 #!/bin/bash
 
-dot_per_box=2
+dot_per_box=10
 starting_point=25
 hop_size=5
-total_hop_steps=4
+total_hop_steps=16
 query_size=2000
 
 exec_time_output_dstfile="/home/lthpc/git/catchment-basin-seeker/plot/exec_robust.csv"
