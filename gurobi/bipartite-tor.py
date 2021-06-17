@@ -52,14 +52,14 @@ with open("/home/lthpc/git/catchment-basin-seeker/data/queries.json") as input:
 
 queries = json.loads(unparsed_queries)
 
-edges_within_switches = [0] * 20
-for i in range(20):
+edges_within_switches = [0] * 8
+for i in range(8):
     edges_within_switches[i] = []
 
 try:
 
     # Create a new model
-    m = gp.Model("bipartite")
+    m = gp.Model("bipartite-tor")
 
     # Create variables for switch weights
     w0 = m.addVar(vtype=GRB.INTEGER, name="w0")
@@ -70,6 +70,7 @@ try:
     w5 = m.addVar(vtype=GRB.INTEGER, name="w5")
     w6 = m.addVar(vtype=GRB.INTEGER, name="w6")
     w7 = m.addVar(vtype=GRB.INTEGER, name="w7")
+    '''
     w8 = m.addVar(vtype=GRB.INTEGER, name="w8")
     w9 = m.addVar(vtype=GRB.INTEGER, name="w9")
     w10 = m.addVar(vtype=GRB.INTEGER, name="w10")
@@ -82,50 +83,55 @@ try:
     w17 = m.addVar(vtype=GRB.INTEGER, name="w17")
     w18 = m.addVar(vtype=GRB.INTEGER, name="w18")
     w19 = m.addVar(vtype=GRB.INTEGER, name="w19")
+    '''
 
     # Create variables for entry candidates
     for index, entry in enumerate(queries):
         # Edge 0~3 is for first switch, 4~7 is for second, and 8 is shared by both (core sws)
-        e_ = m.addVars(range(9), vtype=GRB.BINARY, name='e_')
+        e_ = m.addVars(range(2), vtype=GRB.BINARY, name='e_')
         # Add constraint: ΣE_k = 1 for edges within the same entry
-        m.addConstr(gp.quicksum(e_[i] for i in range(9)) == 1)
+        m.addConstr(gp.quicksum(e_[i] for i in range(2)) == 1)
 
+        '''
         edges_within_switches[16].append(e_[8])
         edges_within_switches[17].append(e_[8])
         edges_within_switches[18].append(e_[8])
         edges_within_switches[19].append(e_[8])
+        '''
 
         # Distribute influence factor from edges to switches
         pod_1 = int(entry['src_host_id']) / 4
         pod_2 = int(entry['dst_host_id']) / 4
 
         edges_within_switches[int(entry['src_host_id'] / 2)].append(e_[0])
-        edges_within_switches[8 + pod_1 * 2].append(e_[1])
-        edges_within_switches[9 + pod_1 * 2].append(e_[1])
-        edges_within_switches[8 + pod_1 * 2].append(e_[2])
-        edges_within_switches[18].append(e_[2])
-        edges_within_switches[19].append(e_[2])
-        edges_within_switches[9 + pod_1 * 2].append(e_[3])
-        edges_within_switches[16].append(e_[3])
-        edges_within_switches[17].append(e_[3])
+        # edges_within_switches[8 + pod_1 * 2].append(e_[1])
+        # edges_within_switches[9 + pod_1 * 2].append(e_[1])
+        # edges_within_switches[8 + pod_1 * 2].append(e_[2])
+        # edges_within_switches[18].append(e_[2])
+        # edges_within_switches[19].append(e_[2])
+        # edges_within_switches[9 + pod_1 * 2].append(e_[3])
+        # edges_within_switches[16].append(e_[3])
+        # edges_within_switches[17].append(e_[3])
 
-        edges_within_switches[int(entry['dst_host_id'] / 2)].append(e_[4])
-        edges_within_switches[8 + pod_2 * 2].append(e_[5])
-        edges_within_switches[9 + pod_2 * 2].append(e_[5])
-        edges_within_switches[8 + pod_2 * 2].append(e_[6])
-        edges_within_switches[18].append(e_[6])
-        edges_within_switches[19].append(e_[6])
-        edges_within_switches[9 + pod_2 * 2].append(e_[7])
-        edges_within_switches[16].append(e_[7])
-        edges_within_switches[17].append(e_[7])
+        edges_within_switches[int(entry['dst_host_id'] / 2)].append(e_[1])
+        # edges_within_switches[8 + pod_2 * 2].append(e_[5])
+        # edges_within_switches[9 + pod_2 * 2].append(e_[5])
+        # edges_within_switches[8 + pod_2 * 2].append(e_[6])
+        # edges_within_switches[18].append(e_[6])
+        # edges_within_switches[19].append(e_[6])
+        # edges_within_switches[9 + pod_2 * 2].append(e_[7])
+        # edges_within_switches[16].append(e_[7])
+        # edges_within_switches[17].append(e_[7])
 
+        '''
         edges_within_switches[16].append(e_[8])
         edges_within_switches[17].append(e_[8])
         edges_within_switches[18].append(e_[8])
         edges_within_switches[19].append(e_[8])
+        '''
 
     # Set objective
-    m.setObjective(20 * (w0 ** 2 + w1 ** 2 + w2 ** 2 + w3 ** 2 + w4 ** 2 + w5 ** 2 + w6 ** 2 + w7 ** 2 + w8 ** 2 + w9 ** 2 + w10 ** 2 + w11 ** 2 + w12 ** 2 + w13 ** 2 + w14 ** 2 + w15 ** 2 + w16 ** 2 + w17 ** 2 + w18 ** 2 + w19 ** 2) - (w0 + w1 + w2 + w3 + w4 + w5 + w6 + w7 + w8 + w9 + w10 + w11 + w12 + w13 + w14 + w15 + w16 + w17 + w18 + w19) ** 2, GRB.MINIMIZE)
+    m.setObjective(20 * (w0 ** 2 + w1 ** 2 + w2 ** 2 + w3 ** 2 + w4 ** 2 + w5 ** 2 + w6 ** 2 + w7 ** 2) - (w0 + w1 + w2 + w3 + w4 + w5 + w6 + w7) ** 2, GRB.MINIMIZE)
 
     # Add constraint: W_i = ΣE_j for j in edges involves in target switch
     m.addConstr(gp.quicksum(edges_within_switches[0]) == w0)
@@ -136,6 +142,7 @@ try:
     m.addConstr(gp.quicksum(edges_within_switches[5]) == w5)
     m.addConstr(gp.quicksum(edges_within_switches[6]) == w6)
     m.addConstr(gp.quicksum(edges_within_switches[7]) == w7)
+    '''
     m.addConstr(gp.quicksum(edges_within_switches[8]) == w8)
     m.addConstr(gp.quicksum(edges_within_switches[9]) == w9)
     m.addConstr(gp.quicksum(edges_within_switches[10]) == w10)
@@ -148,7 +155,7 @@ try:
     m.addConstr(gp.quicksum(edges_within_switches[17]) == w17)
     m.addConstr(gp.quicksum(edges_within_switches[18]) == w18)
     m.addConstr(gp.quicksum(edges_within_switches[19]) == w19)
-
+    '''
 
     # Optimize model
     m.optimize()
@@ -163,7 +170,7 @@ try:
     mean = sum(weights) / len(weights)
     std_dev = (sum((i - mean) ** 2 for i in weights) / len(weights)) ** 0.5
     print('Weight mean = %g, variance = %g' % (mean, std_dev))
-    print(edges_within_switches[10])
+    # print(edges_within_switches[10])
 
 except gp.GurobiError as e:
     print('Error code ' + str(e.errno) + ': ' + str(e))
