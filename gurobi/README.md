@@ -30,3 +30,13 @@ python bipartite.py
 
 Notice that you have to install Gurobi first (it require paid license, however, if you are a
   student, then you are *free* to go)
+
+## Different version of bipartite
+1. Bipartite v1
+Query are from host to host, and monitor is allowed to be on not only ToR
+
+2. Bipartite tor(v2)
+Query are from host to host, but monitor is only allowed on ToR
+
+3. Bipartite v3
+Query are from pod to pod, and monitor is only allowed on ToR

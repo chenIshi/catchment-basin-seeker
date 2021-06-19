@@ -131,7 +131,7 @@ try:
         '''
 
     # Set objective
-    m.setObjective(20 * (w0 ** 2 + w1 ** 2 + w2 ** 2 + w3 ** 2 + w4 ** 2 + w5 ** 2 + w6 ** 2 + w7 ** 2) - (w0 + w1 + w2 + w3 + w4 + w5 + w6 + w7) ** 2, GRB.MINIMIZE)
+    m.setObjective(8 * (w0 ** 2 + w1 ** 2 + w2 ** 2 + w3 ** 2 + w4 ** 2 + w5 ** 2 + w6 ** 2 + w7 ** 2) - (w0 + w1 + w2 + w3 + w4 + w5 + w6 + w7) ** 2, GRB.MINIMIZE)
 
     # Add constraint: W_i = ΣE_j for j in edges involves in target switch
     m.addConstr(gp.quicksum(edges_within_switches[0]) == w0)
