@@ -24,13 +24,15 @@ import json
 # total_query_number = 100
 # entry_within_query = 2
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     parser = ArgumentParser()
 
-    parser.add_argument("-p", "--pod", help="Number of pod in network topology", dest="pod", type=int, default=300)
+    parser.add_argument("-p", "--pod", help="Number of pod in network topology", dest="pod", type=int, default=30)
+
+    args = parser.parse_args()
 
     # the input format should be [((src1, src2, ...), (dst1, dst2, ...)), (), ...]
-    with open("/home/lthpc/git/catchment-basin-seeker/data/queries.json") as input:
+    with open("/home/lthpc/git/catchment-basin-seeker/data/queries-v2.json") as input:
         unparsed_queries = input.read()
 
     queries = json.loads(unparsed_queries)
@@ -66,6 +68,9 @@ if __name__ = "__main__":
         # Add constraint: W_i = ΣE_j for j in edges involves in target switch
         for index in range(args.pod):
             m.addConstr(gp.quicksum(tor_edges[index]) == weights[index])
+        
+        # Limit its node exploration
+        # m.setParam('NodeLimit ', 1000)
 
         # Optimize model
         m.optimize()
