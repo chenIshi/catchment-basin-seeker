@@ -71,6 +71,7 @@ if __name__ == "__main__":
         
         # Limit its node exploration
         # m.setParam('NodeLimit ', 1000)
+        m.setParam('TimeLimit', 180)
 
         # Optimize model
         m.optimize()
