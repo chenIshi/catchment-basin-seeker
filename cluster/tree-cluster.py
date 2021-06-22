@@ -2,6 +2,7 @@
 
 from argparse import ArgumentParser
 from sklearn.cluster import KMeans
+from scipy.spatial import distance
 import json, logging
 
 def one_hot_encoder(inputs: list, size:int):
@@ -9,7 +10,7 @@ def one_hot_encoder(inputs: list, size:int):
     for set_bit in inputs:
         ret_list[int(set_bit)] = 1
     return ret_list
-
+	
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -37,6 +38,32 @@ if __name__ == "__main__":
     kmeans.fit(flat_queries)
     print(kmeans.labels_)
     # y_kmeans = kmeans.predict(X)
+
+	logging.info("Done clustering.")
+
+	# Evaluate objective performance
+	products = [0] * args.cluster
+	sources = [0] * args.cluster
+	for i in range(args.cluster):
+		products[i] = []
+		sources[i] = []
+	for index, label in enumerate(kmeans.labels_):
+		if not products[label]:
+			products[label] = flat_queries[index]
+		else:
+			result = list(a|b for a,b in zip(products[label], flat_queries[index]))
+			products[label] = result
+		sources[label].append(index)
+
+	cost = 0
+	for i in range(args.cluster):
+		for product in products[i]:
+			for source in sources[i]:
+				for idx in source: 
+					cost += distance.hamming(product, flat_queries[idx])
+			
+	
+
 
 
 
