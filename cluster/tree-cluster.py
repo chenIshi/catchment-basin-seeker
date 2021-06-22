@@ -36,33 +36,31 @@ if __name__ == "__main__":
 
     kmeans = KMeans(n_clusters=args.cluster)
     kmeans.fit(flat_queries)
-    print(kmeans.labels_)
+    # print(kmeans.labels_)
     # y_kmeans = kmeans.predict(X)
 
-	logging.info("Done clustering.")
+    logging.info("Done clustering.")
 
-	# Evaluate objective performance
-	products = [0] * args.cluster
-	sources = [0] * args.cluster
-	for i in range(args.cluster):
-		products[i] = []
-		sources[i] = []
-	for index, label in enumerate(kmeans.labels_):
-		if not products[label]:
-			products[label] = flat_queries[index]
-		else:
-			result = list(a|b for a,b in zip(products[label], flat_queries[index]))
-			products[label] = result
-		sources[label].append(index)
+    # Evaluate objective performance
+    products = [0] * args.cluster
+    sources = [0] * args.cluster
+    for i in range(args.cluster):
+        products[i] = []
+        sources[i] = []
+    for index, label in enumerate(kmeans.labels_):
+        if not products[label]:
+            products[label] = flat_queries[index]
+        else:
+            result = list(a|b for a,b in zip(products[label], flat_queries[index]))
+            products[label] = result
+        sources[label].append(index)
 
-	cost = 0
-	for i in range(args.cluster):
-		for product in products[i]:
-			for source in sources[i]:
-				for idx in source: 
-					cost += distance.hamming(product, flat_queries[idx])
+    cost = 0
+    for i in range(args.cluster):
+        for idx in sources[i]:
+            cost += distance.hamming(products[i], flat_queries[idx])
 			
-	
+    print("Overall cost = %d" % (cost))
 
 
 
