@@ -46,7 +46,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--mode", help="Query distribution mode", dest="mode", type=int, default=0)
     # rate render no use when in mode 0
     parser.add_argument("-r", "--rate", help="Query imbalance rate (int in percentage)", dest="rate", type=int, default=50)
-    parser.add_argument("-o", "--output", help="Output json location", dest="output", default="/home/lthpc/git/catchment-basin-seeker/data/queries-v2.json")
+    parser.add_argument("-o", "--output", help="Output json location", dest="output", default="/home/lthpc/git/catchment-basin-seeker/data/queries-v3.json")
 
 
     args = parser.parse_args()
