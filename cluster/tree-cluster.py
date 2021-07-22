@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.WARNING)
         
-    with open("/home/lthpc/git/catchment-basin-seeker/data/queries-v2.json") as input:
+    with open("/home/lthpc/git/catchment-basin-seeker/data/queries-v3.json") as input:
         unparsed_queries = input.read()
 
     # TODO: ADD support for multiple imbalanced sources in gen_query module
