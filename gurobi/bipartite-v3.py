@@ -27,7 +27,7 @@ import json
 if __name__ == "__main__":
     parser = ArgumentParser()
 
-    parser.add_argument("-p", "--pod", help="Number of pod in network topology", dest="pod", type=int, default=30)
+    parser.add_argument("-p", "--pod", help="Number of pod in network topology", dest="pod", type=int, default=32)
 
     args = parser.parse_args()
 

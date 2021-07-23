@@ -39,7 +39,7 @@ def restricted_float(x):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("-p", "--pod", help="Number of pod in network topology", dest="pod", type=int, default=30)
+    parser.add_argument("-p", "--pod", help="Number of pod in network topology", dest="pod", type=int, default=32)
     parser.add_argument("-q", "--query", help="Number of overall queries", dest="query", type=int, default=1000)
     parser.add_argument("-s", "--size", help="Number of pod with src pod and dst pod", dest="size", type=int, default=4)
     # mode 0 for uniform distribution, mode 1 for src-only imbalance, mode 2 for src and dst imbalance, mode 3 for all-to-all query, mode 4 for probabal mode 3
