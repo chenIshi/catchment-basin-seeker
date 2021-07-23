@@ -32,7 +32,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # the input format should be [((src1, src2, ...), (dst1, dst2, ...)), (), ...]
-    with open("/home/lthpc/git/catchment-basin-seeker/data/queries-v2.json") as input:
+    with open("/home/lthpc/git/catchment-basin-seeker/data/queries-v3.json") as input:
         unparsed_queries = input.read()
 
     queries = json.loads(unparsed_queries)

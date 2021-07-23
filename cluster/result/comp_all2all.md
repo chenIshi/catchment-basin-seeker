@@ -1,23 +1,20 @@
 ## Testing parameter
 1000 query tasks, 32 pods, a percentage of queries are spanned by all-to-all query
-And an all-to-all query is involved with 10 sources. And we only want 10 final multicast group.
-We varies the percentage rate from 80% to 5% in this experiment.
+And an all-to-all query is involved with 5 sources. And we only want 5 final multicast group.
+We varies the percentage rate from 80% to 20% in this experiment.
 
 ## Results
 %,cost
-80,20
-75,19
-70,16
-65,72
-60,76
-55,62
-50,75
-45,66
-40,60
-35,109
-30,111
-25,106
-20,112
-15,111
-10,189
-5,313
+80,28
+75,61
+70,38
+65,58
+60,69
+55,67
+50,85
+45,84
+40,129
+35,159
+30,195
+25,201
+20,270

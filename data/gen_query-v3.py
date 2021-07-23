@@ -3,9 +3,12 @@
 from argparse import ArgumentParser
 import json, random, math, logging
 
-def distinct_random_numList_generator(pod_num:int, size:int, isDuplicate=[]):
+def distinct_random_numList_generator(pod_num:int, size:int, isGurobi:bool, isDuplicate=[]):
     numList = []
-    data = list(range(1, pod_num))
+    if isGurobi:
+        data = list(range(0, pod_num))
+    else:
+        data = list(range(1, pod_num))
     random.shuffle(data)
     
     for item in data:
@@ -49,6 +52,7 @@ if __name__ == "__main__":
     # rate render no use when in mode 0
     parser.add_argument("-r", "--rate", help="Query imbalance rate (int in percentage)", dest="rate", type=int, default=50)
     parser.add_argument("-o", "--output", help="Output json location", dest="output", default="/home/lthpc/git/catchment-basin-seeker/data/queries-v3.json")
+    parser.add_argument("-g", "--gurobi", help="Mode for Gurobi", dest="gurobi", type=str2bool, nargs='?', const=True, default=False)
 
 
     args = parser.parse_args()
@@ -57,16 +61,15 @@ if __name__ == "__main__":
 
     queries = []
 
-    imbalanced_src = distinct_random_numList_generator(pod_num=args.pod, size=args.size)
-    imbalanced_dst = distinct_random_numList_generator(pod_num=args.pod, size=args.size, isDuplicate=imbalanced_src)
+    imbalanced_src = distinct_random_numList_generator(pod_num=args.pod, size=args.size, isGurobi=args.gurobi)
+    imbalanced_dst = distinct_random_numList_generator(pod_num=args.pod, size=args.size, isGurobi=args.gurobi, isDuplicate=imbalanced_src)
 
     inv_pods = [0] * args.inv_pods
     prev_pods = []
     # generate arbitary number of distinct switch sets
     for podsIdx in range(args.inv_pods):
-        inv_pods[podsIdx] = distinct_random_numList_generator(pod_num=args.pod, size=args.size, isDuplicate=prev_pods)
+        inv_pods[podsIdx] = distinct_random_numList_generator(pod_num=args.pod, size=args.size, isGurobi=args.gurobi, isDuplicate=prev_pods)
         prev_pods.extend(inv_pods[podsIdx])
-
     current_qentry_num = 0
     while current_qentry_num < args.query:
         if args.mode == 3 or (args.mode == 4 and current_qentry_num < args.query - ((args.inv_pods * (args.inv_pods - 1))/2) and random.random() * 100 > args.chance):
@@ -93,9 +96,9 @@ if __name__ == "__main__":
             if args.mode == 1 and random.random() * 100 < args.rate:
                 src = imbalanced_src
             else:
-                src = distinct_random_numList_generator(pod_num=args.pod, size=args.size)
+                src = distinct_random_numList_generator(pod_num=args.pod, size=args.size, isGurobi=args.gurobi)
 
-            dst = distinct_random_numList_generator(pod_num=args.pod, size=args.size, isDuplicate=src)
+            dst = distinct_random_numList_generator(pod_num=args.pod, size=args.size, isGurobi=args.gurobi, isDuplicate=src)
             queries.append({
                 "src": src,
                 "dst": dst
