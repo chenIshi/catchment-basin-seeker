@@ -3,7 +3,7 @@
 from argparse import ArgumentParser
 from sklearn.cluster import KMeans
 from scipy.spatial import distance
-import json, logging
+import json, logging, random
 
 def one_hot_encoder(inputs: list, size:int):
     ret_list = [0] * size
@@ -56,12 +56,16 @@ if __name__ == "__main__":
             switch_load[entry] += 1
 
     logging.info("Done Load Balance.")
-
+    '''
+    for i in range(32):
+        print(switch_load[i])
+    '''
+    
     # Evaluate objective performance
     avg_switch_load = sum(switch_load) / len(switch_load)
-    variance = (sum((item - avg_switch_load) ** 2 for item in switch_load) / len(switch_load))
+    variance = (sum((item - avg_switch_load) ** 2 for item in switch_load) / len(switch_load)) ** 0.5
 			
-    print("Avg switch load = %f, variance = %f" % (avg_switch_load, variance))
+    print("Avg switch load = %f, std_err = %f" % (avg_switch_load, variance))
 
 
 

@@ -37,7 +37,7 @@ if __name__ == "__main__":
     for index, query in enumerate(queries):
         if (index+1) % batch_size == 0:
             for src_query in src_queries:
-                overall_cost += (len(aggregated_group) - len(src_query))
+                overall_cost += ((len(aggregated_group) - len(src_query))/float(args.pod))
                 '''
                 for entry in aggregated_group:
                     if entry not in src_query:
@@ -46,10 +46,10 @@ if __name__ == "__main__":
             aggregated_group = []
             src_queries = []
         else:
-            src_queries.append(query)
-	    for entry in query:
-		if entry not in aggregated_group:
-	            aggregated_group.append(entry)
+            src_queries.append(query["src"])
+            for entry in query["src"]:
+                if entry not in aggregated_group:
+                    aggregated_group.append(entry)
     
     
 
