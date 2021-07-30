@@ -4,6 +4,7 @@ And an all-to-all query is involved with 5 sources. And we only want 5 final mul
 We varies the percentage rate from 80% to 20% in this experiment.
 
 ## Results
+### Gurobi
 %,cost
 80,28
 75,61
@@ -18,3 +19,19 @@ We varies the percentage rate from 80% to 20% in this experiment.
 30,195
 25,201
 20,270
+
+### Greedy
+%,cost
+80,470
+75,453
+70,517
+65,500
+60,525
+55,555
+50,603
+45,558
+40,627
+35,647
+30,684
+25,739
+20,742
