@@ -3,7 +3,7 @@
 from argparse import ArgumentParser
 from sklearn.cluster import KMeans
 from scipy.spatial import distance
-import json, logging
+import json, logging, csv
 
 def one_hot_encoder(inputs: list, size:int):
     ret_list = [0] * size
@@ -11,6 +11,13 @@ def one_hot_encoder(inputs: list, size:int):
         ret_list[int(set_bit)] = 1
     return ret_list
 	
+def writer(d_type, input_data, isFirst: bool):
+    with open("control-entry-usage.csv", "a") as csvfile:
+        writer = csv.writer(csvfile)
+        if isFirst:
+            writer.writerow(["pkt_num", "type"])
+        for data in input_data:
+            writer.writerow([data, d_type])
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -66,28 +73,35 @@ if __name__ == "__main__":
     switch_load_wo_cluster = [0] * 512
     sw_in_pod = 16
 
+    # print("Len of flat query: %d" % (len(flat_queries)))
+
     for idx in range(8):
         switch_load_wi_cluster[idx] += (len(sources) * 8)
         switch_load_wi_cluster[256+idx] += len(sources)
         switch_load_wo_cluster[idx] += (args.query * 8)
-        switch_load_wo_cluster[256+idx] += len(args.query)
+        switch_load_wo_cluster[256+idx] += args.query
     # With cluster
     for product in products:
-        for pod in product:
-            for aggr_idx in range(8):
-                switch_load_wi_cluster[pod*8 + aggr_idx] += 1
+        for index, pod in enumerate(product):
+            if (pod > 0):
+                for aggr_idx in range(8):
+                    switch_load_wi_cluster[index*8 + aggr_idx] += 1
 
     # Without cluster
-    for source in sources:
-        for pod in source:
-            for aggr_idx in range(8):
-                switch_load_wo_cluster[pod*8 + aggr_idx] += 1
+    for source in flat_queries:
+        for index, pod in enumerate(source):
+            if (pod > 0):
+                for aggr_idx in range(8):
+                    switch_load_wo_cluster[index*8 + aggr_idx] += 1
 
-
+    '''
     avg_wo_cluster = sum(switch_load_wo_cluster) / float(len(switch_load_wo_cluster))
     avg_wi_cluster = sum(switch_load_wi_cluster) / float(len(switch_load_wi_cluster))
     print("Avg wo cluster = %d, wi cluster = %d" % (avg_wo_cluster, avg_wi_cluster))
+    '''
 
+    writer(d_type="W/I Cluster", input_data=switch_load_wi_cluster, isFirst=True)
+    writer(d_type="W/O Cluster", input_data=switch_load_wo_cluster, isFirst=False)
 
 
 
