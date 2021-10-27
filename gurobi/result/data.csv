@@ -1,0 +1,27 @@
+centralized percentage,std,type
+80,92.96,LP
+75,91.8,LP
+70,91.48,LP
+65,88.9,LP
+60,86.72,LP
+55,87.68,LP
+50,82.44,LP
+45,80.54,LP
+40,77.93,LP
+35,73.25,LP
+30,70.4,LP
+25,66.08,LP
+20,54.41,LP
+80,144.36,Greedy
+75,143.72,Greedy
+70,141.51,Greedy
+65,142.47,Greedy
+60,140.77,Greedy
+55,138.62,Greedy
+50,138.16,Greedy
+45,134.68,Greedy
+40,135,Greedy
+35,127.75,Greedy
+30,125.79,Greedy
+25,119.02,Greedy
+20,118.15,Greedy
